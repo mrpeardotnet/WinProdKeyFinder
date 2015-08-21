@@ -34,7 +34,6 @@ namespace WinProdKeyFind
             const int decodeLength = 29;
             const int decodeStringLength = 15;
             var decodedChars = new char[decodeLength];
-            // Extract byte 52 to 67 inclusive.
             var hexPid = new ArrayList();
             for (var i = keyStartIndex; i <= keyEndIndex; i++)
             {
@@ -70,7 +69,6 @@ namespace WinProdKeyFind
             var isWin8 = (byte)((digitalProductId[66] / 6) & 1);
             digitalProductId[66] = (byte)((digitalProductId[66] & 0xf7) | (isWin8 & 2) * 4);
 
-            // Possible alpha-numeric characters in product key.
             const string digits = "BCDFGHJKMPQRTVWXY2346789";
             int last = 0;
             for (var i = 24; i >= 0; i--)
@@ -96,83 +94,6 @@ namespace WinProdKeyFind
                 key = key.Insert(i, "-");
             }
             return key;
-        }
-        //Got ot from http://www.csharphelp.com/board2/read.html?f=1&i=11982&t=11982
-        private static System.DateTime ToDateTime(string dmtfDate)
-        {
-            //There is a utility called mgmtclassgen that ships with the .NET SDK that
-            //will generate managed code for existing WMI classes. It also generates
-            // datetime conversion routines like this one.
-            //Thanks to Chetan Parmar and dotnet247.com for the help.
-            var year = System.DateTime.Now.Year;
-            var month = 1;
-            var day = 1;
-            var hour = 0;
-            var minute = 0;
-            var second = 0;
-            var millisec = 0;
-            var dmtf = dmtfDate;
-
-            if (string.IsNullOrEmpty(dmtf))
-            {
-                return System.DateTime.MinValue;
-            }
-
-            if ((dmtf.Length != 25))
-            {
-                return System.DateTime.MinValue;
-            }
-
-            var tempString = dmtf.Substring(0, 4);
-            if (("****" != tempString))
-            {
-                year = System.Int32.Parse(tempString);
-            }
-
-            tempString = dmtf.Substring(4, 2);
-
-            if (("**" != tempString))
-            {
-                month = System.Int32.Parse(tempString);
-            }
-
-            tempString = dmtf.Substring(6, 2);
-
-            if (("**" != tempString))
-            {
-                day = System.Int32.Parse(tempString);
-            }
-
-            tempString = dmtf.Substring(8, 2);
-
-            if (("**" != tempString))
-            {
-                hour = System.Int32.Parse(tempString);
-            }
-
-            tempString = dmtf.Substring(10, 2);
-
-            if (("**" != tempString))
-            {
-                minute = System.Int32.Parse(tempString);
-            }
-
-            tempString = dmtf.Substring(12, 2);
-
-            if (("**" != tempString))
-            {
-                second = System.Int32.Parse(tempString);
-            }
-
-            tempString = dmtf.Substring(15, 3);
-
-            if (("***" != tempString))
-            {
-                millisec = System.Int32.Parse(tempString);
-            }
-
-            var dateRet = new System.DateTime(year, month, day, hour, minute, second, millisec);
-            return dateRet;
         }
     }
 }
