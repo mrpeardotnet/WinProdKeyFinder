@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Windows.Forms;
 using Timer = System.Timers.Timer;
 
@@ -14,6 +15,8 @@ namespace WinProdKeyFind
 
         private void MainForm_Shown(object sender, EventArgs e)
         {
+            var assemblyName = AssemblyName.GetAssemblyName(Assembly.GetExecutingAssembly().Location);
+            Text = String.Format("{0} v{1}.{2}", Text, assemblyName.Version.Major, assemblyName.Version.Minor);
             GetKey();
         }
         private void GetKey()
