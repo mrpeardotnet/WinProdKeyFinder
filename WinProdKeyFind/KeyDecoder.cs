@@ -84,15 +84,16 @@ namespace WinProdKeyFind
                 }
                 key = digits[current] + key;
             }
+
             var keypart1 = key.Substring(1, last);
-            const string insert = "N";
-            key = key.Substring(1).Replace(keypart1, keypart1 + insert);
-            if (last == 0)
-                key = insert + key;
+            var keypart2 = key.Substring(last + 1, key.Length - (last + 1));
+            key = keypart1 + "N" + keypart2;
+
             for (var i = 5; i < key.Length; i += 6)
             {
                 key = key.Insert(i, "-");
             }
+
             return key;
         }
     }
