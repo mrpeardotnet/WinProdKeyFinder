@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using Microsoft.Win32;
+using System.Linq;
 
 namespace WinProdKeyFind
 {
@@ -8,10 +9,10 @@ namespace WinProdKeyFind
     {
         public static string GetWindowsProductKey()
         {
-                var key = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine,
-                                              RegistryView.Default);
-                const string keyPath = @"Software\Microsoft\Windows NT\CurrentVersion";
-                var digitalProductId = (byte[])key.OpenSubKey(keyPath).GetValue("DigitalProductId");
+            var key = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine,
+                                          RegistryView.Default);
+            const string keyPath = @"Software\Microsoft\Windows NT\CurrentVersion";
+            var digitalProductId = (byte[])key.OpenSubKey(keyPath).GetValue("DigitalProductId");
 
             var isWin8OrUp =
                 (Environment.OSVersion.Version.Major == 6 && System.Environment.OSVersion.Version.Minor >= 2)
@@ -21,6 +22,48 @@ namespace WinProdKeyFind
             var productKey = isWin8OrUp ? DecodeProductKeyWin8AndUp(digitalProductId) : DecodeProductKey(digitalProductId);
             return productKey;
         }
+
+        public static string GetOfficeProductKey(RegistryView registryView = RegistryView.Registry32)
+        {
+            const string keyPath = @"Software\Microsoft\Office";
+
+            var key = RegistryKey
+                .OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
+                .OpenSubKey(keyPath);
+
+            var result = key.FindSubKeyByName("Registration");
+
+            if (result == null)
+                return null;
+
+            var digitalProductId = result.FindValueNameByName("DigitalProductId");
+
+            if (digitalProductId == null)
+                return GetOfficeProductKey(RegistryView.Registry64);
+
+            var isOffice2013OrUp = OfficeVersion(result.Name) > 14;
+
+            var productKey = isOffice2013OrUp ? DecodeProductKeyWin8AndUp(digitalProductId) : DecodeProductKey(digitalProductId);
+
+            return productKey;
+        }
+
+        private static Double OfficeVersion(string path)
+        {
+            var items = path.Split('\\');
+
+            if(items.Count() < 5)
+                return 0;
+
+            Double version = 0;
+            
+            if(Double.TryParse(items[4], out version))
+            {
+                return version;
+            }
+
+            return 0;
+        }            
 
         public static string DecodeProductKey(byte[] digitalProductId)
         {
@@ -76,10 +119,10 @@ namespace WinProdKeyFind
                 var current = 0;
                 for (var j = 14; j >= 0; j--)
                 {
-                    current = current*256;
+                    current = current * 256;
                     current = digitalProductId[j + keyOffset] + current;
-                    digitalProductId[j + keyOffset] = (byte)(current/24);
-                    current = current%24;
+                    digitalProductId[j + keyOffset] = (byte)(current / 24);
+                    current = current % 24;
                     last = current;
                 }
                 key = digits[current] + key;

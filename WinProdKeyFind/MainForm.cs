@@ -22,6 +22,7 @@ namespace WinProdKeyFind
         private void GetKey()
         {
             tbWindowsProductKey.Text = KeyDecoder.GetWindowsProductKey();
+            tbOfficeProductKey.Text = KeyDecoder.GetOfficeProductKey();
         }
 
         private void btnClose_Click(object sender, EventArgs e)
@@ -53,6 +54,11 @@ namespace WinProdKeyFind
         private void llWeb_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             Process.Start("http://www.mrpear.net");
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
