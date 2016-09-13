@@ -19,7 +19,7 @@ namespace WinProdKeyFind
                 ||
                 (Environment.OSVersion.Version.Major > 6);
 
-            var productKey = isWin8OrUp ? DecodeProductKeyWin8AndUp(digitalProductId) : DecodeProductKey(digitalProductId);
+            var productKey = isWin8OrUp ? DecodeProductKeyWin8AndUp(digitalProductId) : DecodeProductKey(digitalProductId, 52);
             return productKey;
         }
 
@@ -41,9 +41,13 @@ namespace WinProdKeyFind
             if (digitalProductId == null)
                 return GetOfficeProductKey(RegistryView.Registry64);
 
-            var isOffice2013OrUp = OfficeVersion(result.Name) > 14;
 
-            var productKey = isOffice2013OrUp ? DecodeProductKeyWin8AndUp(digitalProductId) : DecodeProductKey(digitalProductId);
+            int keyStartIndex = 52;
+
+            if (OfficeVersion(result.Name) >= 14)
+                keyStartIndex = 808;
+
+            var productKey = DecodeProductKey(digitalProductId, keyStartIndex);
 
             return productKey;
         }
@@ -52,23 +56,22 @@ namespace WinProdKeyFind
         {
             var items = path.Split('\\');
 
-            if(items.Count() < 5)
+            if (items.Count() < 5)
                 return 0;
 
             Double version = 0;
-            
-            if(Double.TryParse(items[4], out version))
+
+            if (Double.TryParse(items[4], out version))
             {
                 return version;
             }
 
             return 0;
-        }            
+        }
 
-        public static string DecodeProductKey(byte[] digitalProductId)
+        public static string DecodeProductKey(byte[] digitalProductId, int keyStartIndex)
         {
-            const int keyStartIndex = 52;
-            const int keyEndIndex = keyStartIndex + 15;
+            int keyEndIndex = keyStartIndex + 15;
             var digits = new[]
             {
                 'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'M', 'P', 'Q', 'R',
@@ -139,5 +142,6 @@ namespace WinProdKeyFind
 
             return key;
         }
+
     }
 }
