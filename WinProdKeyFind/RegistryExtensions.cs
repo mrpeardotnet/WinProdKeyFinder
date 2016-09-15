@@ -10,6 +10,10 @@ namespace WinProdKeyFind
     {
         public static RegistryKey FindSubKeyByName(this RegistryKey key, string name)
         {
+
+            if (key == null)
+                return null;
+
             var subKeys = key.GetSubKeyNames();
             var subKey = subKeys.FirstOrDefault(k => k == name);
 
