@@ -8,20 +8,30 @@ namespace WinProdKeyFind
     {
         public static string GetWindowsProductKey()
         {
-                var key = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine,
-                                              RegistryView.Default);
-                const string keyPath = @"Software\Microsoft\Windows NT\CurrentVersion";
-                var digitalProductId = (byte[])key.OpenSubKey(keyPath).GetValue("DigitalProductId");
+            RegistryKey localKey;
+            if (Environment.Is64BitOperatingSystem)
+            {
+                localKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+            }
+            else
+            {
+                localKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
+            }
+
+            var value = (byte[])localKey.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue("DigitalProductId");
+
+            var digitalProductId = value;
 
             var isWin8OrUp =
-                (Environment.OSVersion.Version.Major == 6 && System.Environment.OSVersion.Version.Minor >= 2)
+                (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor >= 2)
                 ||
                 (Environment.OSVersion.Version.Major > 6);
 
             var productKey = isWin8OrUp ? DecodeProductKeyWin8AndUp(digitalProductId) : DecodeProductKey(digitalProductId);
+            localKey.Close(); 
             return productKey;
+           
         }
-
         public static string DecodeProductKey(byte[] digitalProductId)
         {
             const int keyStartIndex = 52;
