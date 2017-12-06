@@ -4,35 +4,69 @@ using Microsoft.Win32;
 
 namespace WinProdKeyFind
 {
-    public class KeyDecoder
+    /// <summary>
+    /// Enumartion that specifies DigitalProductId version
+    /// </summary>
+    public enum DigitalProductIdVersion
     {
-        public static string GetWindowsProductKey()
+        /// <summary>
+        /// All systems up to Windows 7 (Windows 7 and older versions)
+        /// </summary>
+        UpToWindows7,
+        /// <summary>
+        /// Windows 8 and up (Windows 8 and newer versions)
+        /// </summary>
+        Windows8AndUp
+    }
+
+    /// <summary>
+    /// Provides methods to decode Windows Product Key from registry or from DigitalProductId.
+    /// This class is static.
+    /// </summary>
+    public static class KeyDecoder
+    {
+        public static string GetWindowsProductKeyFromRegistry()
         {
-            RegistryKey localKey;
-            if (Environment.Is64BitOperatingSystem)
-            {
-                localKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-            }
-            else
-            {
-                localKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
-            }
+            var localKey =
+                RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, Environment.Is64BitOperatingSystem
+                    ? RegistryView.Registry64
+                    : RegistryView.Registry32);
 
-            var value = (byte[])localKey.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue("DigitalProductId");
-
-            var digitalProductId = value;
-
+            var registryKeyValue = localKey.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion")?.GetValue("DigitalProductId");
+            if (registryKeyValue == null)
+                return "Failed to get DigitalProductId from registry";
+            var digitalProductId = (byte[])registryKeyValue;
+            localKey.Close();
             var isWin8OrUp =
-                (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor >= 2)
+                Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor >= 2
                 ||
-                (Environment.OSVersion.Version.Major > 6);
-
-            var productKey = isWin8OrUp ? DecodeProductKeyWin8AndUp(digitalProductId) : DecodeProductKey(digitalProductId);
-            localKey.Close(); 
-            return productKey;
-           
+                Environment.OSVersion.Version.Major > 6;
+            return GetWindowsProductKeyFromDigitalProductId(digitalProductId,
+                isWin8OrUp ? DigitalProductIdVersion.Windows8AndUp : DigitalProductIdVersion.UpToWindows7);
         }
-        public static string DecodeProductKey(byte[] digitalProductId)
+
+        /// <summary>
+        /// Decodes Windows Product Key from DigitalProductId with specified DigitalProductId version.
+        /// </summary>
+        /// <param name="digitalProductId"></param>
+        /// <param name="digitalProductIdVersion"></param>
+        /// <returns></returns>
+        public static string GetWindowsProductKeyFromDigitalProductId(byte[] digitalProductId, DigitalProductIdVersion digitalProductIdVersion)
+        {
+
+            var productKey = digitalProductIdVersion == DigitalProductIdVersion.Windows8AndUp 
+                ? DecodeProductKeyWin8AndUp(digitalProductId) 
+                : DecodeProductKey(digitalProductId);
+            return productKey;
+        }
+
+        /// <summary>
+        /// Decodes Windows Product Key from the DigitalProductId. 
+        /// This method applies to DigitalProductId from Windows 7 or lower versions of Windows.
+        /// </summary>
+        /// <param name="digitalProductId">DigitalProductId to decode</param>
+        /// <returns>Decoded Windows Product Key as a string</returns>
+        private static string DecodeProductKey(byte[] digitalProductId)
         {
             const int keyStartIndex = 52;
             const int keyEndIndex = keyStartIndex + 15;
@@ -72,6 +106,12 @@ namespace WinProdKeyFind
             return new string(decodedChars);
         }
 
+        /// <summary>
+        /// Decodes Windows Product Key from the DigitalProductId. 
+        /// This method applies to DigitalProductId from Windows 8 or newer versions of Windows.
+        /// </summary>
+        /// <param name="digitalProductId">DigitalProductId to decode</param>
+        /// <returns>Decoded Windows Product Key as a string</returns>
         public static string DecodeProductKeyWin8AndUp(byte[] digitalProductId)
         {
             var key = String.Empty;
@@ -80,7 +120,7 @@ namespace WinProdKeyFind
             digitalProductId[66] = (byte)((digitalProductId[66] & 0xf7) | (isWin8 & 2) * 4);
 
             const string digits = "BCDFGHJKMPQRTVWXY2346789";
-            int last = 0;
+            var last = 0;
             for (var i = 24; i >= 0; i--)
             {
                 var current = 0;
