@@ -61,8 +61,20 @@ namespace WinProdKeyFind
             var t = new Timer(750);
             t.Elapsed += (o, args) =>
             {
-                btnCopyToClipboard.Text = _copyBtnText;
-                btnCopyToClipboard.Enabled = true;
+                var copyToClipboard = new Action(() =>
+                {
+                    btnCopyToClipboard.Text = _copyBtnText;
+                    btnCopyToClipboard.Enabled = true;
+                });
+
+                if (btnCopyToClipboard.InvokeRequired)
+                {
+                    btnCopyToClipboard.Invoke(copyToClipboard);
+                }
+                else
+                {
+                    copyToClipboard();
+                }
             };
             t.Enabled = true;
             t.AutoReset = false;
