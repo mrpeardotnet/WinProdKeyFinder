@@ -58,8 +58,10 @@ namespace WinProdKeyFind
             _copyBtnText = senderButton.Text;
             senderButton.Text = @"Copied...";
             senderButton.Enabled = false;
-            var t = new Timer(750);
-            t.Elapsed += (o, args) =>
+
+            // create timer that will revert button to original state after some delay
+            var timer = new Timer(750);
+            timer.Elapsed += (o, args) =>
             {
                 var copyToClipboard = new Action(() =>
                 {
@@ -67,6 +69,8 @@ namespace WinProdKeyFind
                     btnCopyToClipboard.Enabled = true;
                 });
 
+                // check if we need to call invoke
+                // (needed when the control was created on different thread then the timer event is currently running)
                 if (btnCopyToClipboard.InvokeRequired)
                 {
                     btnCopyToClipboard.Invoke(copyToClipboard);
@@ -76,8 +80,11 @@ namespace WinProdKeyFind
                     copyToClipboard();
                 }
             };
-            t.Enabled = true;
-            t.AutoReset = false;
+
+            // enable the timer (this will start the timer)
+            timer.Enabled = true;
+            // run the timer only once
+            timer.AutoReset = false;
         }
 
         /// <summary>

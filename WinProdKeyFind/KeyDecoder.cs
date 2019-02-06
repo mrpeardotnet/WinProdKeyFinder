@@ -5,7 +5,7 @@ using Microsoft.Win32;
 namespace WinProdKeyFind
 {
     /// <summary>
-    /// Enumartion that specifies DigitalProductId version
+    /// Enumeration that specifies DigitalProductId version
     /// </summary>
     public enum DigitalProductIdVersion
     {
