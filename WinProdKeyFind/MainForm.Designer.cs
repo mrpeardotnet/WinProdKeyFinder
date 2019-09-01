@@ -40,9 +40,11 @@
             this.tbWindowsProductKey.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.tbWindowsProductKey.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.tbWindowsProductKey.Location = new System.Drawing.Point(12, 35);
+            this.tbWindowsProductKey.Multiline = true;
             this.tbWindowsProductKey.Name = "tbWindowsProductKey";
             this.tbWindowsProductKey.ReadOnly = true;
-            this.tbWindowsProductKey.Size = new System.Drawing.Size(407, 29);
+            this.tbWindowsProductKey.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.tbWindowsProductKey.Size = new System.Drawing.Size(407, 101);
             this.tbWindowsProductKey.TabIndex = 0;
             this.tbWindowsProductKey.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -51,24 +53,24 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(12, 16);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(181, 13);
+            this.label1.Size = new System.Drawing.Size(186, 13);
             this.label1.TabIndex = 1;
-            this.label1.Text = "This machine Windows Product Key:";
+            this.label1.Text = "This machine Windows Product Keys:";
             // 
             // btnCopyToClipboard
             // 
-            this.btnCopyToClipboard.Location = new System.Drawing.Point(292, 88);
+            this.btnCopyToClipboard.Location = new System.Drawing.Point(292, 144);
             this.btnCopyToClipboard.Name = "btnCopyToClipboard";
             this.btnCopyToClipboard.Size = new System.Drawing.Size(127, 23);
             this.btnCopyToClipboard.TabIndex = 3;
-            this.btnCopyToClipboard.Text = "Copy key to clipboard";
+            this.btnCopyToClipboard.Text = "Copy keys to clipboard";
             this.btnCopyToClipboard.UseVisualStyleBackColor = true;
             this.btnCopyToClipboard.Click += new System.EventHandler(this.btnCopyToClipboard_Click);
             // 
             // llWeb
             // 
             this.llWeb.AutoSize = true;
-            this.llWeb.Location = new System.Drawing.Point(9, 93);
+            this.llWeb.Location = new System.Drawing.Point(9, 149);
             this.llWeb.Name = "llWeb";
             this.llWeb.Size = new System.Drawing.Size(115, 13);
             this.llWeb.TabIndex = 9;
@@ -78,7 +80,7 @@
             // 
             // btnFromProductKey
             // 
-            this.btnFromProductKey.Location = new System.Drawing.Point(153, 88);
+            this.btnFromProductKey.Location = new System.Drawing.Point(153, 144);
             this.btnFromProductKey.Name = "btnFromProductKey";
             this.btnFromProductKey.Size = new System.Drawing.Size(133, 23);
             this.btnFromProductKey.TabIndex = 10;
@@ -90,7 +92,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(431, 123);
+            this.ClientSize = new System.Drawing.Size(431, 177);
             this.Controls.Add(this.btnFromProductKey);
             this.Controls.Add(this.llWeb);
             this.Controls.Add(this.btnCopyToClipboard);
@@ -99,6 +101,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "MainForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Windows Product Key Finder";
             this.Shown += new System.EventHandler(this.MainForm_Shown);
             this.ResumeLayout(false);

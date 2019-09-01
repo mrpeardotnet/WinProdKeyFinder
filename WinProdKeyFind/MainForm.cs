@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using Timer = System.Timers.Timer;
@@ -33,8 +35,22 @@ namespace WinProdKeyFind
             // format window title text (append version to the current title)
             Text = $@"{Text} v{assemblyName.Version.Major}.{assemblyName.Version.Minor}";
 
-            // get the current Windows Product Key and display it
-            tbWindowsProductKey.Text = KeyDecoder.GetWindowsProductKeyFromRegistry();
+            // possible key locations
+            string[] keyPaths =
+            {
+                @"Software\Microsoft\Windows NT\CurrentVersion",
+                @"Software\Microsoft\Windows NT\CurrentVersion\DefaultProductKey",
+                @"Software\Microsoft\Windows NT\CurrentVersion\DefaultProductKey2"
+            };
+
+            // getting all possible keys and presenting them as a string with NewLine as separator
+            var keys = keyPaths.Select(KeyDecoder.GetWindowsProductKeyFromRegistry)
+                .Where(key => key != "Failed to get DigitalProductId from registry")
+                .Distinct()
+                .Aggregate<string>((first, second) => first + Environment.NewLine + second);
+
+            // get the current Windows Product Keys and display them
+            tbWindowsProductKey.Text = keys;
         }
 
         private string _copyBtnText;

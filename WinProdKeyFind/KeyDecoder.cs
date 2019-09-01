@@ -25,14 +25,14 @@ namespace WinProdKeyFind
     /// </summary>
     public static class KeyDecoder
     {
-        public static string GetWindowsProductKeyFromRegistry()
+        public static string GetWindowsProductKeyFromRegistry(string keyPath)
         {
             var localKey =
                 RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, Environment.Is64BitOperatingSystem
                     ? RegistryView.Registry64
                     : RegistryView.Registry32);
 
-            var registryKeyValue = localKey.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion")?.GetValue("DigitalProductId");
+            var registryKeyValue = localKey.OpenSubKey(keyPath)?.GetValue("DigitalProductId");
             if (registryKeyValue == null)
                 return "Failed to get DigitalProductId from registry";
             var digitalProductId = (byte[])registryKeyValue;
