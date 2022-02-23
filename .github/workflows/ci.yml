@@ -1,0 +1,22 @@
+name: msvc
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v2
+    - uses: microsoft/setup-msbuild@v1.1
+
+    - name: Build
+      run: |
+        MSBuild.exe WinProdKeyFind.sln /p:Configuration=Release /t:Rebuild /m
+
+    - name: Pack
+      uses: actions/upload-artifact@v2
+      with:
+        name: WinProdKeyFind
+        path: |
+          WinProdKeyFind/bin/Release/*.exe
+        if-no-files-found: error
